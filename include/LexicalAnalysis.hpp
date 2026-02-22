@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <iostream>
 #include <string>
 
 #include "tokens.hpp"
@@ -24,47 +23,13 @@ class LexicalAnalysis
         Status CurrentStatus_;
         yyscan_t scanner_;
 
-        void scanTokens()
-        {
-            int CurrentTokenType = yylex(scanner_);
-            std::string CurrentAttribute = std::string(yyget_text(scanner_));
-
-            while(CurrentTokenType != 0)
-            {
-                Tokens_.push_back({CurrentTokenType, CurrentAttribute});
-                CurrentTokenType = yylex(scanner_);
-                CurrentAttribute = std::string(yyget_text(scanner_));
-            }
-
-            Tokens_.push_back({0, "$"});
-        }
-
-        Status checkTokens()
-        {
-            for (size_t i = 0; i < Tokens_.size(); i++)
-            {
-                if (Tokens_[i].TokenType == UNKNOWN_TOKEN)
-                {
-                    std::cerr << "ERROR: Unknown Symbol: " << Tokens_[i].attribute << std::endl;
-                    return Status::Lexical_Error;
-                }
-            }
-
-            return Status::Success;
-        }
+        void scanTokens();
+        Status checkTokens();
 
     public:
-        LexicalAnalysis()
-        {
-            yylex_init(&scanner_);
-            scanTokens();
-            CurrentStatus_ = checkTokens();
-        }
+        LexicalAnalysis();
 
-        ~LexicalAnalysis()
-        {
-            yylex_destroy(scanner_);
-        }
+        ~LexicalAnalysis();
 
         const std::vector<Token>& getTokens() const
         {

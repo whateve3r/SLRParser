@@ -14,7 +14,9 @@ FLEX_TARGET(LexerScanner
 
 
 add_executable(SLR 
-    src/main.cpp 
+    src/main.cpp
+    src/LexicalAnalysis.cpp
+    src/SyntaxAnalysis.cpp 
     ${FLEX_LexerScanner_OUTPUTS}
 )
 
