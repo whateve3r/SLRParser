@@ -6,15 +6,8 @@
 #include "tokens.hpp"
 #include "status.hpp"
 
-using yyscan_t = void*;
-
-int yylex(yyscan_t yyscanner);
-char* yyget_text(yyscan_t yyscanner);
-                                                    
-int yylex_init(yyscan_t* ptr_to_yyscanner);
-int yylex_destroy(yyscan_t yyscanner);
-
-
+using yyscan_t = void*; // flex instance; ptr to flex struct (how to work with input string)
+using YY_BUFFER_STATE = struct yy_buffer_state*; // ptr to struct of an input string
 
 class LexicalAnalysis
 {
@@ -23,11 +16,11 @@ class LexicalAnalysis
         Status CurrentStatus_;
         yyscan_t scanner_;
 
-        void scanTokens();
+        void scanTokens(const std::string& input);
         Status checkTokens();
 
     public:
-        LexicalAnalysis();
+        LexicalAnalysis(const std::string& input);
 
         ~LexicalAnalysis();
 

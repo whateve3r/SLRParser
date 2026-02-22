@@ -4,14 +4,17 @@
 
 int yylex(yyscan_t yyscanner);
 char* yyget_text(yyscan_t yyscanner);
+
+YY_BUFFER_STATE yy_scan_string(const char* str, yyscan_t yyscanner);
+void yy_delete_buffer(YY_BUFFER_STATE buffer, yyscan_t yyscanner);
                                                     
 int yylex_init(yyscan_t* ptr_to_yyscanner);
 int yylex_destroy(yyscan_t yyscanner);
 
-LexicalAnalysis::LexicalAnalysis()
+LexicalAnalysis::LexicalAnalysis(const std::string& input)
 {
     yylex_init(&scanner_);
-    scanTokens();
+    scanTokens(input);
     CurrentStatus_ = checkTokens();
 }
 
@@ -20,8 +23,10 @@ LexicalAnalysis::~LexicalAnalysis()
     yylex_destroy(scanner_);
 }
 
-void LexicalAnalysis::scanTokens()
+void LexicalAnalysis::scanTokens(const std::string& input)
 {
+    YY_BUFFER_STATE InputBuffer = yy_scan_string(input.c_str(), scanner_);
+
     int CurrentTokenType = yylex(scanner_);
     std::string CurrentAttribute = std::string(yyget_text(scanner_));
 
@@ -33,6 +38,8 @@ void LexicalAnalysis::scanTokens()
     }
 
     Tokens_.push_back({0, "$"});
+
+    yy_delete_buffer(InputBuffer, scanner_);
 }
 
 Status LexicalAnalysis::checkTokens()
@@ -41,7 +48,7 @@ Status LexicalAnalysis::checkTokens()
     {
         if (Tokens_[i].TokenType == UNKNOWN_TOKEN)
         {
-            std::cerr << "ERROR: Unknown Symbol: " << Tokens_[i].attribute << std::endl;
+            // std::cerr << "ERROR: Unknown Symbol: " << Tokens_[i].attribute << std::endl;
             return Status::Lexical_Error;
         }
     }

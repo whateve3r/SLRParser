@@ -25,3 +25,6 @@ target_include_directories(SLR PRIVATE
 )
 
 target_link_libraries(SLR ${FLEX_LIBRARIES})
+
+enable_testing()
+add_subdirectory(tests)

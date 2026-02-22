@@ -1,3 +1,4 @@
+#include <iostream>
 #include <cstdlib>
 #include "LexicalAnalysis.hpp"
 #include "SyntaxAnalysis.hpp"
@@ -5,7 +6,12 @@
 
 int main()
 {
-    LexicalAnalysis Lexer;
+
+    std::string input;
+
+    std::getline(std::cin, input);
+
+    LexicalAnalysis Lexer(input);
 
     if (Lexer.getStatus() != Status::Success)
     {

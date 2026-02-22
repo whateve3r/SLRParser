@@ -89,7 +89,7 @@ Status SyntaxAnalysis::SLRParser(const std::vector<Token>& Tokens)
     {
         if (index >= Tokens.size())
         {
-            std::cerr << "ERROR: Unexpected end of input (missing EOF token '$')" << std::endl;
+            // std::cerr << "ERROR: Unexpected end of input (missing EOF token '$')" << std::endl;
             return Status::Syntax_Error;
         }
 
@@ -103,13 +103,13 @@ Status SyntaxAnalysis::SLRParser(const std::vector<Token>& Tokens)
 
         if (action == 0)
         {
-            std::cerr << "ERROR: Syntax Error" << std::endl;
+            // std::cerr << "ERROR: Syntax Error" << std::endl;
             return Status::Syntax_Error;
         }
 
         if (action > 0 && action != 100)
         {
-            recordStep(Stack, Tokens, index, "Shift", buffer);
+            // recordStep(Stack, Tokens, index, "Shift", buffer);
             Stack.push_back(action);
             index++;
         }
@@ -117,7 +117,7 @@ Status SyntaxAnalysis::SLRParser(const std::vector<Token>& Tokens)
 
         if (action < 0)
         {
-            recordStep(Stack, Tokens, index, "Reduce", buffer);
+            // recordStep(Stack, Tokens, index, "Reduce", buffer);
 
             Rule CurrentRule = grammar[abs(action)];
 
@@ -139,7 +139,7 @@ Status SyntaxAnalysis::SLRParser(const std::vector<Token>& Tokens)
                 
         if (action == 100)
         {
-            recordStep(Stack, Tokens, index, "Accept", buffer);
+            // recordStep(Stack, Tokens, index, "Accept", buffer);
 
             std::cout << buffer.str();
 
