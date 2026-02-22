@@ -20,32 +20,32 @@ int yylex_destroy(yyscan_t yyscanner);
 class LexicalAnalysis
 {
     private:
-        std::vector<Token> Tokens;
-        Status CurrentStatus;
-        yyscan_t scanner;
+        std::vector<Token> Tokens_;
+        Status CurrentStatus_;
+        yyscan_t scanner_;
 
         void scanTokens()
         {
-            int CurrentTokenType = yylex(this->scanner);
-            std::string CurrentAttribute = std::string(yyget_text(this->scanner));
+            int CurrentTokenType = yylex(scanner_);
+            std::string CurrentAttribute = std::string(yyget_text(scanner_));
 
             while(CurrentTokenType != 0)
             {
-                Tokens.push_back({CurrentTokenType, CurrentAttribute});
-                CurrentTokenType = yylex(this->scanner);
-                CurrentAttribute = std::string(yyget_text(this->scanner));
+                Tokens_.push_back({CurrentTokenType, CurrentAttribute});
+                CurrentTokenType = yylex(scanner_);
+                CurrentAttribute = std::string(yyget_text(scanner_));
             }
 
-            Tokens.push_back({0, "$"});
+            Tokens_.push_back({0, "$"});
         }
 
         Status checkTokens()
         {
-            for (size_t i = 0; i < Tokens.size(); i++)
+            for (size_t i = 0; i < Tokens_.size(); i++)
             {
-                if (Tokens[i].TokenType == UNKNOWN_TOKEN)
+                if (Tokens_[i].TokenType == UNKNOWN_TOKEN)
                 {
-                    std::cerr << "ERROR: Unknown Symbol: " << Tokens[i].attribute << std::endl;
+                    std::cerr << "ERROR: Unknown Symbol: " << Tokens_[i].attribute << std::endl;
                     return Status::Lexical_Error;
                 }
             }
@@ -56,24 +56,24 @@ class LexicalAnalysis
     public:
         LexicalAnalysis()
         {
-            yylex_init(&scanner);
+            yylex_init(&scanner_);
             scanTokens();
-            CurrentStatus = checkTokens();
+            CurrentStatus_ = checkTokens();
         }
 
         ~LexicalAnalysis()
         {
-            yylex_destroy(scanner);
+            yylex_destroy(scanner_);
         }
 
         const std::vector<Token>& getTokens() const
         {
-            return Tokens;
+            return Tokens_;
         }
 
         Status getStatus() const
         {
-            return CurrentStatus;
+            return CurrentStatus_;
         }
 
 };

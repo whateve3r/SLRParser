@@ -8,16 +8,26 @@
 %}
 
 
-ID          [a-zA-Z]+
+SYMBOLS     [a-zA-Z]+
+DIGITS      (0|[1-9][0-9]*)(\.[0-9]+)?
 WS          [ \t\r\n]+
 
 
 %%
 
-{ID}        {return TOKEN_ID;  }
-{WS}        {                  } 
-"+"         {return TOKEN_PLUS;}
-"*"         {return TOKEN_MULT;}
+{SYMBOLS}   {return TOKEN_ID;      }
+{DIGITS}    {return TOKEN_ID;      }
+
+
+{WS}        {                      } 
+
+"+"         {return TOKEN_PLUS;    }
+"-"         {return TOKEN_MINUS;   }
+"*"         {return TOKEN_MULT;    }
+"/"         {return TOKEN_DIV;     }
+
+"("         {return TOKEN_LBRACKET;}
+")"         {return TOKEN_RBRACKET;}        
 
 .           {return UNKNOWN_TOKEN; }
             

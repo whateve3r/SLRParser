@@ -11,49 +11,51 @@
 
 #include "status.hpp"
 #include "tokens.hpp"
+#include "grammar.hpp"
 
 class SyntaxAnalysis
 {
     private:
-        struct Rule
-        {
-            int LHS;           // Left Hand Side - код нетерминала слева (столбец в таблице)
-            int len;           // Длина правой части, сколько символов удалять
-        };
-
-        static constexpr std::array<Rule, 6> grammar =
-        {{
-            {0, 0},            
-            {4, 3},
-            {4, 1},           
-            {5, 3},
-            {5, 1},
-            {6, 1}
-        }};
-
         static inline const std::map<int, int> TokenToCol = 
         {
-            {TOKEN_ID, 0},
-            {TOKEN_PLUS, 1},
-            {TOKEN_MULT, 2},
-            {TOKEN_EOF, 3}
+            {TOKEN_ID,       0},
+
+            {TOKEN_PLUS,     1},
+            {TOKEN_MINUS,    2},
+
+            {TOKEN_MULT,     3},
+            {TOKEN_DIV,      4},
+
+            {TOKEN_LBRACKET, 5},
+            {TOKEN_RBRACKET, 6},
+
+            {TOKEN_EOF,     10}
         };
 
 
-        static constexpr int COLS = 7;
-        static constexpr int STATES = 9;
+        static constexpr int COLS = 11;
+        static constexpr int STATES = 18;
 
         static constexpr std::array<std::array<int, COLS>, STATES> SLRTable = 
         {{
-            {4, 0, 0, 0, 1, 2,    3},
-            {0, 5, 0, 100, 0, 0,  0},
-            {0, -2, 6, -2, 0, 0,  0},
-            {0, -4, -4, -4, 0, 0, 0},
-            {0, -5, -5, -5, 0, 0, 0},
-            {4, 0, 0, 0, 0, 7,    3},
-            {4, 0, 0, 0, 0, 0,    8},
-            {0, -1, 6, -1, 0, 0,  0},
-            {0, -3, -3, -3, 0, 0, 0}
+            { 5,  0,  6,  0,  0,  4,  0,  1,  2,  3,  0 },
+            { 0,  7, 10,  0,  0,  0,  0,  0,  0,  0, 100},
+            { 0, -3, -3,  8,  9,  0, -3,  0,  0,  0, -3 }, 
+            { 0, -6, -6, -6, -6,  0, -6,  0,  0,  0, -6 }, 
+            { 5,  0,  6,  0,  0,  4,  0, 13,  2,  3,  0 },
+            { 0, -8, -8, -8, -8,  0, -8,  0,  0,  0, -8 },
+            { 5,  0,  6,  0,  0,  4,  0,  0,  0, 12,  0 },
+            { 5,  0,  6,  0,  0,  4,  0,  0, 11,  3,  0 },
+            { 5,  0,  6,  0,  0,  4,  0,  0,  0, 15,  0 },
+            { 5,  0,  6,  0,  0,  4,  0,  0,  0, 16,  0 },
+            { 5,  0,  6,  0,  0,  4,  0,  0, 17,  3,  0 },
+            { 0, -1, -1,  8,  9,  0, -1,  0,  0,  0, -1 },
+            { 0, -9, -9, -9, -9,  0, -9,  0,  0,  0, -9 }, 
+            { 0,  7, 10,  0,  0,  0, 14,  0,  0,  0,  0 },
+            { 0, -7, -7, -7, -7,  0, -7,  0,  0,  0, -7 }, 
+            { 0, -4, -4, -4, -4,  0, -4,  0,  0,  0, -4 },
+            { 0, -5, -5, -5, -5,  0, -5,  0,  0,  0, -5 }, 
+            { 0, -2, -2,  8,  9,  0, -2,  0,  0,  0, -2 }  
         }};
 
 
