@@ -2,6 +2,9 @@
 #include "SyntaxAnalysis.hpp"
 #include <vector>
 
+using namespace SLR;
+using namespace SLR::Parser;
+
 TEST(ParserTest, ValidExpression)
 {
     std::vector<Token> Tokens = 

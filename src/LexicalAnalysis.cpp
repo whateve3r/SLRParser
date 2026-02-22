@@ -1,7 +1,6 @@
 #include <iostream>
 #include "LexicalAnalysis.hpp"
 
-
 int yylex(yyscan_t yyscanner);
 char* yyget_text(yyscan_t yyscanner);
 
@@ -10,6 +9,9 @@ void yy_delete_buffer(YY_BUFFER_STATE buffer, yyscan_t yyscanner);
                                                     
 int yylex_init(yyscan_t* ptr_to_yyscanner);
 int yylex_destroy(yyscan_t yyscanner);
+
+
+namespace SLR::Lexer {
 
 LexicalAnalysis::LexicalAnalysis(const std::string& input)
 {
@@ -48,10 +50,12 @@ Status LexicalAnalysis::checkTokens()
     {
         if (Tokens_[i].TokenType == UNKNOWN_TOKEN)
         {
-            // std::cerr << "ERROR: Unknown Symbol: " << Tokens_[i].attribute << std::endl;
+            std::cerr << "ERROR: Unknown Symbol: " << Tokens_[i].attribute << std::endl;
             return Status::Lexical_Error;
         }
     }
 
     return Status::Success;
+}
+
 }

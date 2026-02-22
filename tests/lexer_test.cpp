@@ -1,6 +1,9 @@
 #include <gtest/gtest.h>
 #include "LexicalAnalysis.hpp"
 
+using namespace SLR;
+using namespace SLR::Lexer;
+
 TEST(LexerTest, RecognizesBasicTokens)
 {
     std::string input = "x + 42";

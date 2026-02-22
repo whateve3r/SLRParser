@@ -2,6 +2,8 @@
 
 #include <string>
 
+namespace SLR {
+
 enum TokenType
 {
     TOKEN_EOF      =  0,
@@ -24,3 +26,5 @@ struct Token
     int TokenType;
     std::string attribute;
 };
+
+}

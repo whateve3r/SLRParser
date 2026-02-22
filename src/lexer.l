@@ -2,9 +2,9 @@
 %option reentrant
 
 %{
-#include <stdio.h>
-#include <stdlib.h>
 #include "tokens.hpp"
+
+using namespace SLR;
 %}
 
 

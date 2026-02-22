@@ -10,6 +10,8 @@
 #include "tokens.hpp"
 #include "grammar.hpp"
 
+namespace SLR::Parser {
+
 class SyntaxAnalysis
 {
     private:
@@ -26,3 +28,5 @@ class SyntaxAnalysis
     public:
         Status SLRParser(const std::vector<Token>& Tokens);
 };
+
+}

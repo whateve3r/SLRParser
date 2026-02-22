@@ -11,18 +11,18 @@ int main()
 
     std::getline(std::cin, input);
 
-    LexicalAnalysis Lexer(input);
+    SLR::Lexer::LexicalAnalysis Lexer(input);
 
-    if (Lexer.getStatus() != Status::Success)
+    if (Lexer.getStatus() != SLR::Status::Success)
     {
         return EXIT_FAILURE;
     }
 
-    SyntaxAnalysis SLRParser;
+    SLR::Parser::SyntaxAnalysis SLRParser;
 
-    Status ParserStatus = SLRParser.SLRParser(Lexer.getTokens());
+    SLR::Status ParserStatus = SLRParser.SLRParser(Lexer.getTokens());
 
-    if (ParserStatus != Status::Success)
+    if (ParserStatus != SLR::Status::Success)
     {
         return EXIT_FAILURE;
     }

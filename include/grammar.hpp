@@ -3,6 +3,8 @@
 #include <string>
 #include <array>
 
+namespace SLR {
+
 struct Rule
 {
     int LHS;           // Left Hand Side - код нетерминала слева
@@ -25,3 +27,5 @@ inline constexpr std::array<Rule, RuleCount> grammar =
     {9, 1},            // F -> ID
     {9, 2}             // F -> -F
 }};
+
+}

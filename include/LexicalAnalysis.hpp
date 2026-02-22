@@ -9,6 +9,8 @@
 using yyscan_t = void*; // flex instance; ptr to flex struct (how to work with input string)
 using YY_BUFFER_STATE = struct yy_buffer_state*; // ptr to struct of an input string
 
+namespace SLR::Lexer {
+
 class LexicalAnalysis
 {
     private:
@@ -35,3 +37,5 @@ class LexicalAnalysis
         }
 
 };
+
+}
