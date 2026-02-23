@@ -1,6 +1,8 @@
 #include <iostream>
 #include <sstream>
 #include <cassert>
+#include <fstream>
+#include <iomanip>
 
 #include "SyntaxAnalysis.hpp"
 
@@ -56,26 +58,23 @@ int SyntaxAnalysis::getColIndex(int token)
 
 void SyntaxAnalysis::recordStep(const std::vector<int>& stack, const std::vector<Token>& input, size_t cursor, std::string ActionString, std::stringstream& buffer)
 {
-    buffer << "STACK:  $";
+    std::string stack_str;
 
-    for (size_t i = 0; i < stack.size(); i++)
+    for (size_t i = 0; i < stack.size(); i++) 
     {
-        buffer << stack[i] << " ";
+        stack_str += std::to_string(stack[i]) + " ";
     }
 
-    buffer << std::endl;
+    std::string input_str;
 
-
-    buffer << "INPUT:  ";
-
-    for (size_t j = cursor; j < input.size(); j++)
+    for (size_t j = cursor; j < input.size(); j++) 
     {
-        buffer << input[j].attribute;
+        input_str += input[j].attribute; 
     }
 
-    buffer << std::endl;
-
-    buffer << "ACTION: " << ActionString << std::endl;
+    buffer << "| " << std::left << std::setw(20) << stack_str 
+           << " | " << std::left << std::setw(15) << input_str 
+           << " | " << ActionString << "\n";
 }
 
 Status SyntaxAnalysis::SLRParser(const std::vector<Token>& Tokens)
@@ -84,6 +83,10 @@ Status SyntaxAnalysis::SLRParser(const std::vector<Token>& Tokens)
     Stack.push_back(0);
 
     std::stringstream buffer;
+
+    buffer << "| " << std::left << std::setw(20) << "STACK" 
+           << " | " << std::left << std::setw(15) << "INPUT" 
+           << " | ACTION \n";
 
     size_t index = 0;
 
@@ -111,7 +114,7 @@ Status SyntaxAnalysis::SLRParser(const std::vector<Token>& Tokens)
 
         if (action > 0 && action != 100)
         {
-            recordStep(Stack, Tokens, index, "Shift", buffer);
+            recordStep(Stack, Tokens, index, "Shift " + std::to_string(action), buffer);
             Stack.push_back(action);
             index++;
         }
@@ -119,7 +122,7 @@ Status SyntaxAnalysis::SLRParser(const std::vector<Token>& Tokens)
 
         if (action < 0)
         {
-            recordStep(Stack, Tokens, index, "Reduce", buffer);
+            recordStep(Stack, Tokens, index, "Reduce " + std::to_string(abs(action)), buffer);
 
             Rule CurrentRule = grammar[abs(action)];
 
@@ -143,7 +146,9 @@ Status SyntaxAnalysis::SLRParser(const std::vector<Token>& Tokens)
         {
             recordStep(Stack, Tokens, index, "Accept", buffer);
 
-            std::cout << buffer.str();
+            std::ofstream outfile("OutputTable.txt");
+
+            outfile << buffer.str();
 
             return Status::Success;
         }
