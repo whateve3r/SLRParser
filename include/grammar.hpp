@@ -7,8 +7,8 @@ namespace SLR {
 
 struct Rule
 {
-    int LHS;           // Left Hand Side - код нетерминала слева
-    int len;           // Длина правой части, сколько символов удалять
+    int LHS;          
+    int len;           
 };
 
 inline constexpr int RuleCount = 10;
