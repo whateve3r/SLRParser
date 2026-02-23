@@ -81,7 +81,7 @@
 
 ```bash
 git clone https://github.com/whateve3r/SLRParser.git
-cd SLR
+cd SLRParser
 cmake -B build -S . 
 cmake --build build
 ```
