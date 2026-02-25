@@ -5,18 +5,19 @@
 namespace SLR {
 
 enum class TokenType
-{
-    END_OF_FILE =  0,
-    
-    ID          =  1,
+{    
+    ID          =  0,
 
-    PLUS        =  2,
-    MINUS       =  3,
-    MULT        =  4,
-    DIV         =  5,
+    PLUS        =  1,
+    MINUS       =  2,
+    MULT        =  3,
+    DIV         =  4,
 
-    L_BRACKET   =  6,
-    R_BRACKET   =  7,
+    L_BRACKET   =  5,
+    R_BRACKET   =  6,
+
+    END_OF_FILE =  7,
+
 
     UNKNOWN     =  8
 };

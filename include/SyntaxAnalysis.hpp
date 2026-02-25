@@ -14,8 +14,6 @@ namespace SLR::Parser {
 class SyntaxAnalysis
 {
     private:
-        size_t GetColIndex(TokenType Token);
-
         void RecordStep(const std::vector<size_t>& Stack, const std::vector<Token>& Input, size_t Cursor, const std::string& ActionString, std::stringstream& Buffer);
 
     public:

@@ -1,6 +1,5 @@
 #include <iostream>
 #include <sstream>
-#include <cassert>
 #include <fstream>
 #include <iomanip>
 #include <limits>
@@ -75,38 +74,6 @@ constexpr std::array<std::array<size_t, COLS_GOTO>, STATES> GOTOTable
 
 } // namespace
 
-size_t SyntaxAnalysis::GetColIndex(TokenType Type)
-{
-    switch(Type)
-    {
-        case TokenType::ID:
-            return 0;
-
-        case TokenType::PLUS:
-            return 1;
-
-        case TokenType::MINUS:
-            return 2;
-
-        case TokenType::MULT:
-            return 3;
-
-        case TokenType::DIV:
-            return 4;
-
-        case TokenType::L_BRACKET:
-            return 5;
-
-        case TokenType::R_BRACKET:
-            return 6;
-
-        case TokenType::END_OF_FILE:
-            return 7;
-
-        default:
-            assert(false && "Unknown Token Type in GetColIndex func");
-    }
-}
 
 void SyntaxAnalysis::RecordStep(const std::vector<size_t>& Stack, const std::vector<Token>& Input, size_t Cursor, const std::string& ActionString, std::stringstream& Buffer)
 {
@@ -150,11 +117,8 @@ Status SyntaxAnalysis::SLRParser(const std::vector<Token>& Tokens)
             return Status::SYNTAX_ERROR;
         }
 
-
-        SLR::TokenType Lookahead = Tokens[Index].Type;
-
         size_t CurrentState = Stack.back();
-        size_t CurrentCol   = GetColIndex(Lookahead);
+        size_t CurrentCol   = static_cast<size_t>(Tokens[Index].Type);
 
         ActionCell Cell = ActionTable[CurrentState][CurrentCol];
 
