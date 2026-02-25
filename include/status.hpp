@@ -4,9 +4,9 @@ namespace SLR {
 
 enum class Status
 {
-    Success = 0,
-    Lexical_Error = 1,
-    Syntax_Error = 2
+    SUCCESS       = 0,
+    LEXICAL_ERROR = 1,
+    SYNTAX_ERROR  = 2
 };
 
 }

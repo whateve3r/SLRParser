@@ -16,26 +16,26 @@ class LexicalAnalysis
     private:
         std::vector<Token> Tokens_;
         Status CurrentStatus_;
-        yyscan_t scanner_;
+        yyscan_t Scanner_;
 
-        void scanTokens(const std::string& input);
-        Status checkTokens();
+        void ScanTokens(const std::string& Input);
+        Status CheckTokens();
 
     public:
-        LexicalAnalysis(const std::string& input);
+        LexicalAnalysis(const std::string& Input);
 
         ~LexicalAnalysis();
 
-        const std::vector<Token>& getTokens() const
+        const std::vector<Token>& GetTokens() const
         {
             return Tokens_;
         }
 
-        Status getStatus() const
+        Status GetStatus() const
         {
             return CurrentStatus_;
         }
 
 };
 
-}
+} // namespace Lexer

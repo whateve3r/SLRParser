@@ -13,16 +13,16 @@ int main()
 
     SLR::Lexer::LexicalAnalysis Lexer(input);
 
-    if (Lexer.getStatus() != SLR::Status::Success)
+    if (Lexer.GetStatus() != SLR::Status::SUCCESS)
     {
         return EXIT_FAILURE;
     }
 
     SLR::Parser::SyntaxAnalysis SLRParser;
 
-    SLR::Status ParserStatus = SLRParser.SLRParser(Lexer.getTokens());
+    SLR::Status ParserStatus = SLRParser.SLRParser(Lexer.GetTokens());
 
-    if (ParserStatus != SLR::Status::Success)
+    if (ParserStatus != SLR::Status::SUCCESS)
     {
         return EXIT_FAILURE;
     }

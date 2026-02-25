@@ -4,27 +4,27 @@
 
 namespace SLR {
 
-enum TokenType
+enum class TokenType
 {
-    TOKEN_EOF      =  0,
+    END_OF_FILE =  0,
     
-    TOKEN_ID       =  1,
+    ID          =  1,
 
-    TOKEN_PLUS     =  2,
-    TOKEN_MINUS    =  3,
-    TOKEN_MULT     =  4,
-    TOKEN_DIV      =  5,
+    PLUS        =  2,
+    MINUS       =  3,
+    MULT        =  4,
+    DIV         =  5,
 
-    TOKEN_LBRACKET =  6,
-    TOKEN_RBRACKET =  7,
+    L_BRACKET   =  6,
+    R_BRACKET   =  7,
 
-    UNKNOWN_TOKEN  =  8
+    UNKNOWN     =  8
 };
 
 struct Token
 {
-    int TokenType;
-    std::string attribute;
+    TokenType Type;
+    std::string Attribute;
 };
 
 }

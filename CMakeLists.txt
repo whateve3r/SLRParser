@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(FLEX REQUIRED)
 
 FLEX_TARGET(LexerScanner 
-            src/lexer.l 
+            src//lexer/lexer.l 
             ${CMAKE_CURRENT_BINARY_DIR}/lexer.cpp)
 
 add_library(slr_core 

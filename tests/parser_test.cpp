@@ -9,65 +9,65 @@ TEST(ParserTest, ValidExpression)
 {
     std::vector<Token> Tokens = 
     {
-        {TOKEN_ID, "a"},
-        {TOKEN_PLUS, "+"},
-        {TOKEN_ID, "b"},
-        {0, "$"}
+        {TokenType::ID,   "a"},
+        {TokenType::PLUS, "+"},
+        {TokenType::ID,   "b"},
+        {TokenType::END_OF_FILE, "$"}
     };
 
     SyntaxAnalysis parser;
 
-    EXPECT_EQ(parser.SLRParser(Tokens), Status::Success);
+    EXPECT_EQ(parser.SLRParser(Tokens), Status::SUCCESS);
 }
 
 TEST(ParserTest, Brackets)
 {
     std::vector<Token> Tokens = 
     {
-        {TOKEN_LBRACKET, "("},
-        {TOKEN_LBRACKET, "("},
-        {TOKEN_ID, "a"},
-        {TOKEN_RBRACKET, ")"},
-        {TOKEN_RBRACKET, ")"},
-        {0, "$"}
+        {TokenType::L_BRACKET, "("},
+        {TokenType::L_BRACKET, "("},
+        {TokenType::ID, "a"},
+        {TokenType::R_BRACKET, ")"},
+        {TokenType::R_BRACKET, ")"},
+        {TokenType::END_OF_FILE, "$"}
     };
 
     SyntaxAnalysis parser;
 
-    EXPECT_EQ(parser.SLRParser(Tokens), Status::Success);
+    EXPECT_EQ(parser.SLRParser(Tokens), Status::SUCCESS);
 }
 
 TEST(ParserAdvanced, OperatorPrecedence)
 {
     std::vector<Token> Tokens =
     {
-        {TOKEN_ID, "a"}, 
-        {TOKEN_PLUS, "+"}, 
-        {TOKEN_ID, "b"}, 
-        {TOKEN_MULT, "*"}, 
-        {TOKEN_ID, "c"}, 
-        {0, "$"}
+        {TokenType::ID, "a"}, 
+        {TokenType::PLUS, "+"}, 
+        {TokenType::ID, "b"}, 
+        {TokenType::MULT, "*"}, 
+        {TokenType::ID, "c"}, 
+        {TokenType::END_OF_FILE, "$"}
     };
 
     SyntaxAnalysis parser;
 
-    EXPECT_EQ(parser.SLRParser(Tokens), Status::Success);
+    EXPECT_EQ(parser.SLRParser(Tokens), Status::SUCCESS);
 }
 
 TEST(ParserAdvanced, UnaryMinus)
 {
     std::vector<Token> Tokens =
     {
-        {TOKEN_MINUS, "-"},
-        {TOKEN_ID, "a"}, 
-        {TOKEN_PLUS, "+"}, 
-        {TOKEN_ID, "b"}, 
-        {0, "$"}
+        {TokenType::MINUS, "-"},
+        {TokenType::ID, "a"}, 
+        {TokenType::PLUS, "+"}, 
+        {TokenType::ID, "b"}, 
+        {TokenType::END_OF_FILE, "$"}
     };
 
     SyntaxAnalysis parser;
 
-    EXPECT_EQ(parser.SLRParser(Tokens), Status::Success);
+    EXPECT_EQ(parser.SLRParser(Tokens), Status::SUCCESS);
 }
 
 
@@ -75,26 +75,26 @@ TEST(ParserTest, InvalidExpression)
 {
     std::vector<Token> Tokens = 
     {
-        {TOKEN_PLUS, "+"},
-        {TOKEN_ID, "a"},
-        {0, "$"}
+        {TokenType::PLUS, "+"},
+        {TokenType::ID, "a"},
+        {TokenType::END_OF_FILE, "$"}
     };
 
     SyntaxAnalysis parser;
 
-    EXPECT_EQ(parser.SLRParser(Tokens), Status::Syntax_Error);
+    EXPECT_EQ(parser.SLRParser(Tokens), Status::SYNTAX_ERROR);
 }
 
 TEST(ParserTest, MissingEOF)
 {
     std::vector<Token> Tokens = 
     {
-        {TOKEN_ID, "a"},
-        {TOKEN_MULT, "*"},
-        {TOKEN_ID, "b"},
+        {TokenType::ID, "a"},
+        {TokenType::MULT, "*"},
+        {TokenType::ID, "b"},
     };
 
     SyntaxAnalysis parser;
 
-    EXPECT_EQ(parser.SLRParser(Tokens), Status::Syntax_Error);
+    EXPECT_EQ(parser.SLRParser(Tokens), Status::SYNTAX_ERROR);
 }

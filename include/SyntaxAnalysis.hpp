@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <array>
-#include <map>
 #include <string>
 
 
@@ -15,18 +14,26 @@ namespace SLR::Parser {
 class SyntaxAnalysis
 {
     private:
-        static const std::map<int, int> TokenToCol;
+        size_t GetColIndex(TokenType Token);
 
-        static constexpr int COLS = 11;
-        static constexpr int STATES = 18;
-        static const std::array<std::array<int, COLS>, STATES> SLRTable;
-
-        int getColIndex(int token);
-
-        void recordStep(const std::vector<int>& stack, const std::vector<Token>& input, size_t cursor, std::string ActionString, std::stringstream& buffer);
+        void RecordStep(const std::vector<size_t>& Stack, const std::vector<Token>& Input, size_t Cursor, const std::string& ActionString, std::stringstream& Buffer);
 
     public:
+        enum class Action
+        {
+            SHIFT,
+            REDUCE,
+            ACCEPT,
+            ERROR
+        };
+
+        struct ActionCell
+        {
+            Action Action_;
+            size_t Value;
+        };
+
         Status SLRParser(const std::vector<Token>& Tokens);
 };
 
-}
+} // namespace Parser

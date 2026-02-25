@@ -1,7 +1,7 @@
 #include <iostream>
 #include "LexicalAnalysis.hpp"
 
-int yylex(yyscan_t yyscanner);
+SLR::TokenType yylex(yyscan_t yyscanner);
 char* yyget_text(yyscan_t yyscanner);
 
 YY_BUFFER_STATE yy_scan_string(const char* str, yyscan_t yyscanner);
@@ -13,49 +13,49 @@ int yylex_destroy(yyscan_t yyscanner);
 
 namespace SLR::Lexer {
 
-LexicalAnalysis::LexicalAnalysis(const std::string& input)
+LexicalAnalysis::LexicalAnalysis(const std::string& Input)
 {
-    yylex_init(&scanner_);
-    scanTokens(input);
-    CurrentStatus_ = checkTokens();
+    yylex_init(&Scanner_);
+    ScanTokens(Input);
+    CurrentStatus_ = CheckTokens();
 }
 
 LexicalAnalysis::~LexicalAnalysis()
 {
-    yylex_destroy(scanner_);
+    yylex_destroy(Scanner_);
 }
 
-void LexicalAnalysis::scanTokens(const std::string& input)
+void LexicalAnalysis::ScanTokens(const std::string& Input)
 {
-    YY_BUFFER_STATE InputBuffer = yy_scan_string(input.c_str(), scanner_);
+    YY_BUFFER_STATE InputBuffer = yy_scan_string(Input.c_str(), Scanner_);
 
-    int CurrentTokenType = yylex(scanner_);
-    std::string CurrentAttribute = std::string(yyget_text(scanner_));
+    SLR::TokenType CurrentTokenType = yylex(Scanner_);
+    std::string CurrentAttribute = std::string(yyget_text(Scanner_));
 
-    while(CurrentTokenType != 0)
+    while(CurrentTokenType != TokenType::END_OF_FILE)
     {
         Tokens_.push_back({CurrentTokenType, CurrentAttribute});
-        CurrentTokenType = yylex(scanner_);
-        CurrentAttribute = std::string(yyget_text(scanner_));
+        CurrentTokenType = yylex(Scanner_);
+        CurrentAttribute = std::string(yyget_text(Scanner_));
     }
 
-    Tokens_.push_back({0, "$"});
+    Tokens_.push_back({TokenType::END_OF_FILE, "$"});
 
-    yy_delete_buffer(InputBuffer, scanner_);
+    yy_delete_buffer(InputBuffer, Scanner_);
 }
 
-Status LexicalAnalysis::checkTokens()
+Status LexicalAnalysis::CheckTokens()
 {
     for (size_t i = 0; i < Tokens_.size(); i++)
     {
-        if (Tokens_[i].TokenType == UNKNOWN_TOKEN)
+        if (Tokens_[i].Type == TokenType::UNKNOWN)
         {
-            std::cerr << "ERROR: Unknown Symbol: " << Tokens_[i].attribute << std::endl;
-            return Status::Lexical_Error;
+            std::cerr << "ERROR: Unknown Symbol: " << Tokens_[i].Attribute << std::endl;
+            return Status::LEXICAL_ERROR;
         }
     }
 
-    return Status::Success;
+    return Status::SUCCESS;
 }
 
 }

@@ -3,158 +3,216 @@
 #include <cassert>
 #include <fstream>
 #include <iomanip>
+#include <limits>
 
 #include "SyntaxAnalysis.hpp"
 
 namespace SLR::Parser {
 
-const std::map<int, int> SyntaxAnalysis::TokenToCol = 
-{
-    {TOKEN_ID,       0},
+namespace {
 
-    {TOKEN_PLUS,     1},
-    {TOKEN_MINUS,    2},
+constexpr size_t COLS_ACTION = 8;
+constexpr size_t COLS_GOTO = 3;
+constexpr size_t STATES = 18;
 
-    {TOKEN_MULT,     3},
-    {TOKEN_DIV,      4},
+constexpr size_t ERR_STATE = std::numeric_limits<size_t>::max();
 
-    {TOKEN_LBRACKET, 5},
-    {TOKEN_RBRACKET, 6},
 
-    {TOKEN_EOF,     10}
-};
+#define S(Value) {SyntaxAnalysis::Action::SHIFT,  Value}
+#define R(Value) {SyntaxAnalysis::Action::REDUCE, Value}
+#define ERR      {SyntaxAnalysis::Action::ERROR,      0}
+#define ACC      {SyntaxAnalysis::Action::ACCEPT,     0}
 
-const std::array<std::array<int, SyntaxAnalysis::COLS>, SyntaxAnalysis::STATES> SyntaxAnalysis::SLRTable = 
-{{
-    // id  +   -   *   /   (   )   E   T   F   $
-    {  5,  0,  6,  0,  0,  4,  0,  1,  2,  3,  0 },   // STATE  0 (START)
-    {  0,  7, 10,  0,  0,  0,  0,  0,  0,  0, 100},   // STATE  1
-    {  0, -3, -3,  8,  9,  0, -3,  0,  0,  0, -3 },   // STATE  2
-    {  0, -6, -6, -6, -6,  0, -6,  0,  0,  0, -6 },   // STATE  3
-    {  5,  0,  6,  0,  0,  4,  0, 13,  2,  3,  0 },   // STATE  4
-    {  0, -8, -8, -8, -8,  0, -8,  0,  0,  0, -8 },   // STATE  5
-    {  5,  0,  6,  0,  0,  4,  0,  0,  0, 12,  0 },   // STATE  6
-    {  5,  0,  6,  0,  0,  4,  0,  0, 11,  3,  0 },   // STATE  7
-    {  5,  0,  6,  0,  0,  4,  0,  0,  0, 15,  0 },   // STATE  8
-    {  5,  0,  6,  0,  0,  4,  0,  0,  0, 16,  0 },   // STATE  9
-    {  5,  0,  6,  0,  0,  4,  0,  0, 17,  3,  0 },   // STATE 10
-    {  0, -1, -1,  8,  9,  0, -1,  0,  0,  0, -1 },   // STATE 11
-    {  0, -9, -9, -9, -9,  0, -9,  0,  0,  0, -9 },   // STATE 12
-    {  0,  7, 10,  0,  0,  0, 14,  0,  0,  0,  0 },   // STATE 13
-    {  0, -7, -7, -7, -7,  0, -7,  0,  0,  0, -7 },   // STATE 14
-    {  0, -4, -4, -4, -4,  0, -4,  0,  0,  0, -4 },   // STATE 15
-    {  0, -5, -5, -5, -5,  0, -5,  0,  0,  0, -5 },   // STATE 16
-    {  0, -2, -2,  8,  9,  0, -2,  0,  0,  0, -2 }    // STATE 17
+constexpr std::array<std::array<SyntaxAnalysis::ActionCell, COLS_ACTION>, STATES> ActionTable = 
+{{  // id     +      -      *      /      (      )       $
+    {{ S(5),  ERR,   S(6),  ERR,   ERR,   S(4),  ERR,   ERR  }}, // State 0
+    {{ ERR,   S(7),  S(10), ERR,   ERR,   ERR,   ERR,   ACC  }}, // State 1
+    {{ ERR,   R(3),  R(3),  S(8),  S(9),  ERR,   R(3),  R(3) }}, // State 2
+    {{ ERR,   R(6),  R(6),  R(6),  R(6),  ERR,   R(6),  R(6) }}, // State 3
+    {{ S(5),  ERR,   S(6),  ERR,   ERR,   S(4),  ERR,   ERR  }}, // State 4
+    {{ ERR,   R(8),  R(8),  R(8),  R(8),  ERR,   R(8),  R(8) }}, // State 5
+    {{ S(5),  ERR,   S(6),  ERR,   ERR,   S(4),  ERR,   ERR  }}, // State 6
+    {{ S(5),  ERR,   S(6),  ERR,   ERR,   S(4),  ERR,   ERR  }}, // State 7
+    {{ S(5),  ERR,   S(6),  ERR,   ERR,   S(4),  ERR,   ERR  }}, // State 8
+    {{ S(5),  ERR,   S(6),  ERR,   ERR,   S(4),  ERR,   ERR  }}, // State 9
+    {{ S(5),  ERR,   S(6),  ERR,   ERR,   S(4),  ERR,   ERR  }}, // State 10
+    {{ ERR,   R(1),  R(1),  S(8),  S(9),  ERR,   R(1),  R(1) }}, // State 11
+    {{ ERR,   R(9),  R(9),  R(9),  R(9),  ERR,   R(9),  R(9) }}, // State 12
+    {{ ERR,   S(7),  S(10), ERR,   ERR,   ERR,   S(14), ERR  }}, // State 13
+    {{ ERR,   R(7),  R(7),  R(7),  R(7),  ERR,   R(7),  R(7) }}, // State 14
+    {{ ERR,   R(4),  R(4),  R(4),  R(4),  ERR,   R(4),  R(4) }}, // State 15
+    {{ ERR,   R(5),  R(5),  R(5),  R(5),  ERR,   R(5),  R(5) }}, // State 16
+    {{ ERR,   R(2),  R(2),  S(8),  S(9),  ERR,   R(2),  R(2) }}  // State 17
 }};
 
-int SyntaxAnalysis::getColIndex(int token)
+#undef S
+#undef R
+#undef ERR
+#undef ACC
+
+constexpr std::array<std::array<size_t, COLS_GOTO>, STATES> GOTOTable
+{{
+    //      E          T           F
+    {{      1    ,     2    ,     3      }}, // State 0
+    {{  ERR_STATE, ERR_STATE, ERR_STATE  }}, // State 1
+    {{  ERR_STATE, ERR_STATE, ERR_STATE  }}, // State 2
+    {{  ERR_STATE, ERR_STATE, ERR_STATE  }}, // State 3
+    {{     13    ,     2    ,    3       }}, // State 4
+    {{  ERR_STATE, ERR_STATE, ERR_STATE  }}, // State 5
+    {{  ERR_STATE, ERR_STATE,    12      }}, // State 6
+    {{  ERR_STATE,    11    ,     3      }}, // State 7
+    {{  ERR_STATE, ERR_STATE,    15      }}, // State 8
+    {{  ERR_STATE, ERR_STATE,    16      }}, // State 9
+    {{  ERR_STATE,    17    ,     3      }}, // State 10
+    {{  ERR_STATE, ERR_STATE, ERR_STATE  }}, // State 11
+    {{  ERR_STATE, ERR_STATE, ERR_STATE  }}, // State 12
+    {{  ERR_STATE, ERR_STATE, ERR_STATE  }}, // State 13
+    {{  ERR_STATE, ERR_STATE, ERR_STATE  }}, // State 14
+    {{  ERR_STATE, ERR_STATE, ERR_STATE  }}, // State 15
+    {{  ERR_STATE, ERR_STATE, ERR_STATE  }}, // State 16
+    {{  ERR_STATE, ERR_STATE, ERR_STATE  }}, // State 17
+}};
+
+} // namespace
+
+size_t SyntaxAnalysis::GetColIndex(TokenType Type)
 {
-    auto TokenToPtr = TokenToCol.find(token);
+    switch(Type)
+    {
+        case TokenType::ID:
+            return 0;
 
-    assert(TokenToPtr != TokenToCol.end());
+        case TokenType::PLUS:
+            return 1;
 
-    return TokenToPtr->second;
+        case TokenType::MINUS:
+            return 2;
+
+        case TokenType::MULT:
+            return 3;
+
+        case TokenType::DIV:
+            return 4;
+
+        case TokenType::L_BRACKET:
+            return 5;
+
+        case TokenType::R_BRACKET:
+            return 6;
+
+        case TokenType::END_OF_FILE:
+            return 7;
+
+        default:
+            assert(false && "Unknown Token Type in GetColIndex func");
+    }
 }
 
-void SyntaxAnalysis::recordStep(const std::vector<int>& stack, const std::vector<Token>& input, size_t cursor, std::string ActionString, std::stringstream& buffer)
+void SyntaxAnalysis::RecordStep(const std::vector<size_t>& Stack, const std::vector<Token>& Input, size_t Cursor, const std::string& ActionString, std::stringstream& Buffer)
 {
-    std::string stack_str;
+    std::string Stack_Str;
 
-    for (size_t i = 0; i < stack.size(); i++) 
+    for (size_t i = 0; i < Stack.size(); i++) 
     {
-        stack_str += std::to_string(stack[i]) + " ";
+        Stack_Str += std::to_string(Stack[i]) + " ";
     }
 
-    std::string input_str;
+    std::string Input_Str;
 
-    for (size_t j = cursor; j < input.size(); j++) 
+    for (size_t j = Cursor; j < Input.size(); j++) 
     {
-        input_str += input[j].attribute; 
+        Input_Str += Input[j].Attribute; 
     }
 
-    buffer << "| " << std::left << std::setw(20) << stack_str 
-           << " | " << std::left << std::setw(15) << input_str 
+    Buffer << "| "  << std::left << std::setw(20)  << Stack_Str 
+           << " | " << std::left << std::setw(15)  << Input_Str 
            << " | " << ActionString << "\n";
 }
 
 Status SyntaxAnalysis::SLRParser(const std::vector<Token>& Tokens)
 {
-    std::vector<int> Stack;
+    std::vector<size_t> Stack;
     Stack.push_back(0);
 
-    std::stringstream buffer;
+    std::stringstream Buffer;
 
-    buffer << "| " << std::left << std::setw(20) << "STACK" 
+    Buffer << "| " << std::left << std::setw(20) << "STACK" 
            << " | " << std::left << std::setw(15) << "INPUT" 
            << " | ACTION \n";
 
-    size_t index = 0;
+    size_t Index = 0;
 
     while (true)
     {
-        if (index >= Tokens.size())
+        if (Index >= Tokens.size())
         {
             std::cerr << "ERROR: Unexpected end of input (missing EOF token '$')" << std::endl;
-            return Status::Syntax_Error;
+            return Status::SYNTAX_ERROR;
         }
 
 
-        int Lookahead = Tokens[index].TokenType;
+        SLR::TokenType Lookahead = Tokens[Index].Type;
 
-        int CurrentState = Stack.back();
-        int CurrentCol = getColIndex(Lookahead);
+        size_t CurrentState = Stack.back();
+        size_t CurrentCol   = GetColIndex(Lookahead);
 
-        int action = SLRTable.at(CurrentState).at(CurrentCol);
+        ActionCell Cell = ActionTable[CurrentState][CurrentCol];
 
-        if (action == 0)
+        switch(Cell.Action_)
         {
-            std::cerr << "ERROR: Syntax Error" << std::endl;
-            return Status::Syntax_Error;
-        }
-
-        if (action > 0 && action != 100)
-        {
-            recordStep(Stack, Tokens, index, "Shift " + std::to_string(action), buffer);
-            Stack.push_back(action);
-            index++;
-        }
+            case SyntaxAnalysis::Action::ERROR:
+                std::cerr << "ERROR: Syntax Error" << std::endl;
+                return Status::SYNTAX_ERROR;
 
 
-        if (action < 0)
-        {
-            recordStep(Stack, Tokens, index, "Reduce " + std::to_string(abs(action)), buffer);
+            case SyntaxAnalysis::Action::SHIFT:
+                RecordStep(Stack, Tokens, Index, "Shift " + std::to_string(Cell.Value), Buffer);
+                Stack.push_back(Cell.Value);
+                Index++;
+                break;
 
-            Rule CurrentRule = grammar[abs(action)];
 
-            int LHS = CurrentRule.LHS;
-            int len = CurrentRule.len;
-
-            for (int i = 0; i < len; i++)
+            case SyntaxAnalysis::Action::REDUCE:
             {
-                Stack.pop_back();
+                RecordStep(Stack, Tokens, Index, "Reduce " + std::to_string(Cell.Value), Buffer);
+
+                Rule CurrentRule = Grammar[Cell.Value];
+
+                NonTerminals LHS = CurrentRule.LHS;
+                size_t Len = CurrentRule.Len;
+
+                for (size_t i = 0; i < Len; i++)
+                {
+                    Stack.pop_back();
+                }
+
+                size_t StateBefore = Stack.back();
+
+                size_t NewState = GOTOTable[StateBefore][static_cast<size_t>(LHS)];
+
+                if (NewState == ERR_STATE)
+                {
+                    std::cerr << "ERROR: Syntax Error" << std::endl;
+                    return Status::SYNTAX_ERROR;
+                }
+
+                Stack.push_back(NewState);
+                break;
             }
 
-            int StateBefore = Stack.back();
+            case SyntaxAnalysis::Action::ACCEPT:
+            {
+                RecordStep(Stack, Tokens, Index, "Accept",  Buffer);
 
-            int NewState = SLRTable[StateBefore][LHS];
+                std::ofstream outfile("OutputTable.txt");
+                outfile << Buffer.str();
 
-            Stack.push_back(NewState);
-        }
-
-                
-        if (action == 100)
-        {
-            recordStep(Stack, Tokens, index, "Accept", buffer);
-
-            std::ofstream outfile("OutputTable.txt");
-
-            outfile << buffer.str();
-
-            return Status::Success;
+                return Status::SUCCESS;
+            }
         }
 
     }
 
 }
 
-}
+} // namespace Parser

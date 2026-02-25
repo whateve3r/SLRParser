@@ -9,15 +9,16 @@ TEST(LexerTest, RecognizesBasicTokens)
     std::string input = "x + 42";
     LexicalAnalysis lexer(input);
 
-    ASSERT_EQ(lexer.getStatus(), Status::Success);
-    const auto& tokens = lexer.getTokens();
+    ASSERT_EQ(lexer.GetStatus(), Status::SUCCESS);
+    const auto& tokens = lexer.GetTokens();
 
     ASSERT_EQ(tokens.size(), 4);
-    EXPECT_EQ(tokens[0].TokenType, TOKEN_ID);
-    EXPECT_EQ(tokens[0].attribute, "x");
-    EXPECT_EQ(tokens[2].TokenType, TOKEN_ID);
-    EXPECT_EQ(tokens[2].attribute, "42");
-    EXPECT_EQ(tokens[3].attribute, "$");
+    EXPECT_EQ(tokens[0].Type, TokenType::ID);
+    EXPECT_EQ(tokens[0].Attribute, "x");
+    EXPECT_EQ(tokens[2].Type, TokenType::ID);
+    EXPECT_EQ(tokens[2].Attribute, "42");
+    EXPECT_EQ(tokens[3].Type, TokenType::END_OF_FILE);
+    EXPECT_EQ(tokens[3].Attribute, "$");
 }
 
 TEST(LexerTest, HandlesUnknownSymbol)
@@ -25,5 +26,5 @@ TEST(LexerTest, HandlesUnknownSymbol)
     std::string input = "a # b"; 
     LexicalAnalysis lexer(input);
 
-    EXPECT_EQ(lexer.getStatus(), Status::Lexical_Error);
+    EXPECT_EQ(lexer.GetStatus(), Status::LEXICAL_ERROR);
 }
