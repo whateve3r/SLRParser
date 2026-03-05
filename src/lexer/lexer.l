@@ -1,14 +1,10 @@
-%option noyywrap
-%option reentrant
-
 %{
 #include "tokens.hpp"
-
-#define YY_DECL SLR::TokenType yylex(yyscan_t yyscanner)
-#define YY_NULL SLR::TokenType::END_OF_FILE
-
 using namespace SLR;
 %}
+
+%option noyywrap
+%option c++
 
 
 SYMBOLS     [a-zA-Z]+
@@ -17,21 +13,20 @@ WS          [ \t\r\n]+
 
 
 %%
+{SYMBOLS}   {return static_cast<int>(TokenType::ID);         }
+{DIGITS}    {return static_cast<int>(TokenType::ID);         }
+{WS}        {                                                } 
 
-{SYMBOLS}   {return TokenType::ID;      }
-{DIGITS}    {return TokenType::ID;     }
+"+"         {return static_cast<int>(TokenType::PLUS);       }
+"-"         {return static_cast<int>(TokenType::MINUS);      }
+"*"         {return static_cast<int>(TokenType::MULT);       }
+"/"         {return static_cast<int>(TokenType::DIV);        }
 
+"("         {return static_cast<int>(TokenType::L_BRACKET);  }
+")"         {return static_cast<int>(TokenType::R_BRACKET);  }   
 
-{WS}        {                           } 
+<<EOF>>     {return static_cast<int>(TokenType::END_OF_FILE);}
 
-"+"         {return TokenType::PLUS;    }
-"-"         {return TokenType::MINUS;   }
-"*"         {return TokenType::MULT;    }
-"/"         {return TokenType::DIV;     }
-
-"("         {return TokenType::L_BRACKET;}
-")"         {return TokenType::R_BRACKET;}        
-
-.           {return TokenType::UNKNOWN; }
+.           {return static_cast<int>(TokenType::UNKNOWN);    }
             
 

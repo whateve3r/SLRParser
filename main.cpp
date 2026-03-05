@@ -1,17 +1,28 @@
 #include <iostream>
 #include <cstdlib>
+#include <fstream>
 #include "LexicalAnalysis.hpp"
 #include "SyntaxAnalysis.hpp"
 
 
-int main()
+int main(const int argc, const char* argv[])
 {
+    std::ifstream InputFile;
+    std::ofstream OutputFile;
 
-    std::string input;
+    std::istream* Input = &std::cin;
 
-    std::getline(std::cin, input);
+    if (argc >= 2)
+    {
+        InputFile.open(argv[1]);
+        Input = &InputFile;
+    }
 
-    SLR::Lexer::LexicalAnalysis Lexer(input);
+    std::string FileName = (argc >= 3) ? argv[2] : "../Result.log";
+    OutputFile.open(FileName);
+
+
+    SLR::Lexer::LexicalAnalysis Lexer(*Input, OutputFile);
 
     if (Lexer.GetStatus() != SLR::Status::SUCCESS)
     {
@@ -20,7 +31,7 @@ int main()
 
     SLR::Parser::SyntaxAnalysis SLRParser;
 
-    SLR::Status ParserStatus = SLRParser.SLRParser(Lexer.GetTokens());
+    SLR::Status ParserStatus = SLRParser.SLRParser(Lexer.GetTokens(), OutputFile);
 
     if (ParserStatus != SLR::Status::SUCCESS)
     {
@@ -28,4 +39,5 @@ int main()
     }
 
     return EXIT_SUCCESS;
+
 }

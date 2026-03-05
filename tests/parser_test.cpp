@@ -15,9 +15,11 @@ TEST(ParserTest, ValidExpression)
         {TokenType::END_OF_FILE, "$"}
     };
 
+    std::stringstream buff;
+
     SyntaxAnalysis parser;
 
-    EXPECT_EQ(parser.SLRParser(Tokens), Status::SUCCESS);
+    EXPECT_EQ(parser.SLRParser(Tokens, buff), Status::SUCCESS);
 }
 
 TEST(ParserTest, Brackets)
@@ -32,9 +34,11 @@ TEST(ParserTest, Brackets)
         {TokenType::END_OF_FILE, "$"}
     };
 
+    std::stringstream buff;
+
     SyntaxAnalysis parser;
 
-    EXPECT_EQ(parser.SLRParser(Tokens), Status::SUCCESS);
+    EXPECT_EQ(parser.SLRParser(Tokens, buff), Status::SUCCESS);
 }
 
 TEST(ParserAdvanced, OperatorPrecedence)
@@ -49,9 +53,11 @@ TEST(ParserAdvanced, OperatorPrecedence)
         {TokenType::END_OF_FILE, "$"}
     };
 
+    std::stringstream buff;
+
     SyntaxAnalysis parser;
 
-    EXPECT_EQ(parser.SLRParser(Tokens), Status::SUCCESS);
+    EXPECT_EQ(parser.SLRParser(Tokens, buff), Status::SUCCESS);
 }
 
 TEST(ParserAdvanced, UnaryMinus)
@@ -65,9 +71,11 @@ TEST(ParserAdvanced, UnaryMinus)
         {TokenType::END_OF_FILE, "$"}
     };
 
+    std::stringstream buff;
+
     SyntaxAnalysis parser;
 
-    EXPECT_EQ(parser.SLRParser(Tokens), Status::SUCCESS);
+    EXPECT_EQ(parser.SLRParser(Tokens, buff), Status::SUCCESS);
 }
 
 
@@ -80,9 +88,11 @@ TEST(ParserTest, InvalidExpression)
         {TokenType::END_OF_FILE, "$"}
     };
 
+    std::stringstream buff;
+
     SyntaxAnalysis parser;
 
-    EXPECT_EQ(parser.SLRParser(Tokens), Status::SYNTAX_ERROR);
+    EXPECT_EQ(parser.SLRParser(Tokens, buff), Status::SYNTAX_ERROR);
 }
 
 TEST(ParserTest, MissingEOF)
@@ -94,7 +104,9 @@ TEST(ParserTest, MissingEOF)
         {TokenType::ID, "b"},
     };
 
+    std::stringstream buff;
+
     SyntaxAnalysis parser;
 
-    EXPECT_EQ(parser.SLRParser(Tokens), Status::SYNTAX_ERROR);
+    EXPECT_EQ(parser.SLRParser(Tokens, buff), Status::SYNTAX_ERROR);
 }

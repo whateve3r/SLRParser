@@ -25,7 +25,7 @@ enum class TokenType
 struct Token
 {
     TokenType Type;
-    std::string Attribute;
+    std::string Attribute;    
 };
 
 }

@@ -77,13 +77,13 @@
 
 ### Ввод
 
-На вход подается строка
+На вход подается текст из консоли или файла
 ```bash
 a + b
 ```
 ### Вывод
 
-На выходе получаем файл OutputTable.txt с таблицей:
+Создается файл (по умолчанию Result.log) с таблицей:
 | STACK | INPUT | ACTION |
 | :--- | :--- | :--- |
 | 0 | a+b$ | Shift 5 |
@@ -104,7 +104,7 @@ a + b
 
 * **CMake**
 * **Flex** (Lexical analyzer generator)
-* **G++**
+* **GCC/Clang**
 * **Google Test** (`libgtest-dev`)
 
 ### Сборка

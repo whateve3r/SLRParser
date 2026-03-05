@@ -75,35 +75,33 @@ constexpr std::array<std::array<size_t, COLS_GOTO>, STATES> GOTOTable
 } // namespace
 
 
-void SyntaxAnalysis::RecordStep(const std::vector<size_t>& Stack, const std::vector<Token>& Input, size_t Cursor, const std::string& ActionString, std::stringstream& Buffer)
+void SyntaxAnalysis::RecordStep(const std::vector<size_t>& Stack, const std::vector<Token>& Input, size_t Cursor, const std::string& ActionString, std::ostream& Output)
 {
-    std::string Stack_Str;
+    std::string StackStr;
 
     for (size_t i = 0; i < Stack.size(); i++) 
     {
-        Stack_Str += std::to_string(Stack[i]) + " ";
+        StackStr += std::to_string(Stack[i]) + " ";
     }
 
-    std::string Input_Str;
+    std::string InputStr;
 
     for (size_t j = Cursor; j < Input.size(); j++) 
     {
-        Input_Str += Input[j].Attribute; 
+        InputStr += Input[j].Attribute; 
     }
 
-    Buffer << "| "  << std::left << std::setw(20)  << Stack_Str 
-           << " | " << std::left << std::setw(15)  << Input_Str 
+    Output << "| "  << std::left << std::setw(20)  << StackStr 
+           << " | " << std::left << std::setw(15)  << InputStr 
            << " | " << ActionString << "\n";
 }
 
-Status SyntaxAnalysis::SLRParser(const std::vector<Token>& Tokens)
+Status SyntaxAnalysis::SLRParser(const std::vector<Token>& Tokens, std::ostream& Output)
 {
     std::vector<size_t> Stack;
     Stack.push_back(0);
 
-    std::stringstream Buffer;
-
-    Buffer << "| " << std::left << std::setw(20) << "STACK" 
+    Output << "| " << std::left << std::setw(20) << "STACK" 
            << " | " << std::left << std::setw(15) << "INPUT" 
            << " | ACTION \n";
 
@@ -113,7 +111,7 @@ Status SyntaxAnalysis::SLRParser(const std::vector<Token>& Tokens)
     {
         if (Index >= Tokens.size())
         {
-            std::cerr << "ERROR: Unexpected end of input (missing EOF token '$')" << std::endl;
+            Output << "ERROR: Unexpected end of input (missing EOF token '$')" << std::endl;
             return Status::SYNTAX_ERROR;
         }
 
@@ -125,12 +123,12 @@ Status SyntaxAnalysis::SLRParser(const std::vector<Token>& Tokens)
         switch(Cell.Action_)
         {
             case SyntaxAnalysis::Action::ERROR:
-                std::cerr << "ERROR: Syntax Error" << std::endl;
+                Output << "ERROR: Syntax Error" << std::endl;
                 return Status::SYNTAX_ERROR;
 
 
             case SyntaxAnalysis::Action::SHIFT:
-                RecordStep(Stack, Tokens, Index, "Shift " + std::to_string(Cell.Value), Buffer);
+                RecordStep(Stack, Tokens, Index, "Shift " + std::to_string(Cell.Value), Output);
                 Stack.push_back(Cell.Value);
                 Index++;
                 break;
@@ -138,7 +136,7 @@ Status SyntaxAnalysis::SLRParser(const std::vector<Token>& Tokens)
 
             case SyntaxAnalysis::Action::REDUCE:
             {
-                RecordStep(Stack, Tokens, Index, "Reduce " + std::to_string(Cell.Value), Buffer);
+                RecordStep(Stack, Tokens, Index, "Reduce " + std::to_string(Cell.Value), Output);
 
                 Rule CurrentRule = Grammar[Cell.Value];
 
@@ -156,7 +154,7 @@ Status SyntaxAnalysis::SLRParser(const std::vector<Token>& Tokens)
 
                 if (NewState == ERR_STATE)
                 {
-                    std::cerr << "ERROR: Syntax Error" << std::endl;
+                    Output << "ERROR: Syntax Error" << std::endl;
                     return Status::SYNTAX_ERROR;
                 }
 
@@ -166,11 +164,7 @@ Status SyntaxAnalysis::SLRParser(const std::vector<Token>& Tokens)
 
             case SyntaxAnalysis::Action::ACCEPT:
             {
-                RecordStep(Stack, Tokens, Index, "Accept",  Buffer);
-
-                std::ofstream outfile("OutputTable.txt");
-                outfile << Buffer.str();
-
+                RecordStep(Stack, Tokens, Index, "Accept",  Output);
                 return Status::SUCCESS;
             }
         }

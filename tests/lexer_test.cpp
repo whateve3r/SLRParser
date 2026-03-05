@@ -6,8 +6,12 @@ using namespace SLR::Lexer;
 
 TEST(LexerTest, RecognizesBasicTokens)
 {
-    std::string input = "x + 42";
-    LexicalAnalysis lexer(input);
+    std::stringstream output;
+   
+    std::string str = "x + 42";
+    std::stringstream input(str);
+
+    LexicalAnalysis lexer(input, output);
 
     ASSERT_EQ(lexer.GetStatus(), Status::SUCCESS);
     const auto& tokens = lexer.GetTokens();
@@ -23,8 +27,12 @@ TEST(LexerTest, RecognizesBasicTokens)
 
 TEST(LexerTest, HandlesUnknownSymbol)
 {
-    std::string input = "a # b"; 
-    LexicalAnalysis lexer(input);
+    std::stringstream output;
+
+    std::string str = "a # b";
+    std::stringstream input(str);
+     
+    LexicalAnalysis lexer(input, output);
 
     EXPECT_EQ(lexer.GetStatus(), Status::LEXICAL_ERROR);
 }
